@@ -1,97 +1,249 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 💍 Shadi Brain – Mobile App (Frontend)
 
-# Getting Started
+A modern **React Native (CLI)** mobile application for managing wedding planning, budgets, events, and tasks collaboratively with family members.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## 🚀 Tech Stack
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+* **React Native CLI**
+* **TypeScript**
+* **React Navigation (Stack)**
+* **Zustand (State Management)**
+* **Axios (API Handling)**
+* **Formik + Yup (Forms & Validation)**
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+---
 
-```sh
-# Using npm
-npm start
+## 📁 Project Structure
 
-# OR using Yarn
-yarn start
+```id="s3h2kd"
+src/
+│── components/
+│   ├── Button.tsx
+│   ├── Input.tsx
+│   ├── Header.tsx
+│
+│── screens/
+│   ├── auth/
+│   │   ├── LoginScreen.tsx
+│   │   ├── RegisterScreen.tsx
+│   │
+│   ├── weddings/
+│   │   ├── MyWeddingsScreen.tsx
+│   │   ├── CreateWeddingScreen.tsx
+│   │
+│   ├── events/
+│   │   ├── EventsScreen.tsx
+│   │
+│   ├── HomeScreen.tsx
+│
+│── navigation/
+│   ├── RootStack.tsx
+│   ├── AuthStack.tsx
+│   ├── AppStack.tsx
+│
+│── store/
+│   └── authStore.ts
+│
+│── utils/
+│   ├── axios.ts
+│   ├── storage.ts
+│   ├── validation.ts
+│   ├── toast.ts
+│
+│── constants/
+│   └── index.ts
 ```
 
-## Step 2: Build and run your app
+---
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## 🔐 Authentication Flow
 
-### Android
+* JWT-based authentication
+* Token stored securely using AsyncStorage
+* Zustand used for global auth state
 
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```id="2hzlsk"
+Login → Save Token → Store User → Navigate to App
 ```
 
-### iOS
+---
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## 🧭 Navigation Flow
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```id="pjz91s"
+RootStack
+   ├── AuthStack (Login / Register)
+   └── AppStack (Home → Weddings → Events)
 ```
 
-Then, and every time you update your native dependencies, run:
+---
 
-```sh
-bundle exec pod install
+## 📱 Core Screens
+
+### 🔑 Auth
+
+* Login Screen
+* Register Screen
+
+### 🏠 Home
+
+* Dashboard UI
+* Budget Overview
+* Quick Actions
+
+### 💒 Weddings
+
+* List all weddings
+* Create new wedding
+
+### 🎉 Events
+
+* Event listing per wedding
+* Event-based navigation
+
+---
+
+## 🧩 Reusable Components
+
+### 🔹 Button
+
+* Variants: Primary, Outline
+* Loading state support
+
+### 🔹 Input
+
+* Label + Error handling
+* Password toggle
+* Clean UI
+
+### 🔹 Header
+
+* Reusable across screens
+* Title, subtitle, avatar, notification
+
+---
+
+## 🌐 API Integration
+
+Axios instance configured:
+
+```id="3e0l2o"
+Authorization: Bearer <token>
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+* Auto attaches JWT token
+* Centralized API handling
 
-```sh
-# Using npm
-npm run ios
+---
 
-# OR using Yarn
-yarn ios
+## ⚙️ Setup Instructions
+
+### 1. Clone Repository
+
+```id="9xt2b8"
+git clone <repo-url>
+cd frontend
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+---
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### 2. Install Dependencies
 
-## Step 3: Modify your app
+```id="k9e4zt"
+npm install
+```
 
-Now that you have successfully run the app, let's make changes!
+---
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### 3. Start Metro
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+```id="iqwzlb"
+npx react-native start
+```
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+---
 
-## Congratulations! :tada:
+### 4. Run App
 
-You've successfully run and modified your React Native App. :partying_face:
+#### Android
 
-### Now what?
+```id="c3bl3q"
+npx react-native run-android
+```
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
 
-# Troubleshooting
+## 🔧 Environment Setup
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+Update API base URL in:
 
-# Learn More
+```id="wokc3z"
+src/utils/axios.ts
+```
 
-To learn more about React Native, take a look at the following resources:
+```ts id="dtrm3b"
+baseURL: "http://localhost:5000/api"
+```
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+👉 For Android Emulator:
+
+```id="7rmk7m"
+http://10.0.2.2:5000/api
+```
+
+---
+
+## 🧪 Testing
+
+* Use real backend APIs
+* Ensure token is set after login
+* Verify navigation flow
+
+---
+
+## 📌 Features Implemented
+
+* ✅ Authentication (Login/Register)
+* ✅ Navigation (Auth + App separation)
+* ✅ Wedding Management UI
+* ✅ Event Flow (basic)
+* ✅ Reusable UI Components
+* ✅ Form Validation
+* ✅ API Integration
+
+---
+
+## 🚧 Upcoming Features
+
+* Expense Tracking
+* Task Management
+* Notifications
+* Charts & Analytics
+* Multi-user collaboration UI
+
+---
+
+## 🎨 UI/UX Highlights
+
+* Clean wedding-themed design
+* Soft color palette
+* Mobile-first UX
+* Minimal & intuitive layouts
+
+---
+
+## 👨‍💻 Author
+
+Built with ❤️ Ehatisham Khan
+
+---
+
+## ⭐ Notes
+
+* Uses React Native CLI (no Expo)
+* Scalable folder structure
+* Clean separation of concerns
+* Production-ready architecture
+
+---
