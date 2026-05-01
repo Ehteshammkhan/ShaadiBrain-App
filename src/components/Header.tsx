@@ -1,10 +1,17 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface HeaderProps {
   title: string;
   subtitle?: string;
   onBellPress?: () => void;
+  onLogoutPress?: () => void;
   userInitials?: string;
 }
 
@@ -12,10 +19,13 @@ export default function Header({
   title,
   subtitle,
   onBellPress,
+  onLogoutPress,
   userInitials = "FM",
 }: HeaderProps) {
+  const insets = useSafeAreaInsets(); // ✅ safe top spacing
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Left */}
       <View>
         <Text style={styles.title}>{title}</Text>
@@ -27,6 +37,12 @@ export default function Header({
         <TouchableOpacity onPress={onBellPress}>
           <Text style={styles.icon}>🔔</Text>
         </TouchableOpacity>
+
+        {onLogoutPress && (
+          <TouchableOpacity onPress={onLogoutPress}>
+            <Text style={styles.icon}>🚪</Text>
+          </TouchableOpacity>
+        )}
 
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{userInitials}</Text>
@@ -41,7 +57,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+
+    paddingHorizontal: 16,
+    paddingVertical: 16,  
   },
 
   title: {

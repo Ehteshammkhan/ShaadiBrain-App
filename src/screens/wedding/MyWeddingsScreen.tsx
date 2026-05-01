@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,30 +6,45 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
 import API from "../../utils/axios";
-import Button from "../../components/Button";
 import { showError } from "../../utils/toast";
+import Header from "../../components/Header";
 
 export default function MyWeddingsScreen({ navigation }: any) {
-  const [weddings, setWeddings] = useState([]);
+  const [weddings, setWeddings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
+  // 🔥 Fetch Weddings
   const fetchWeddings = async () => {
     try {
-      const res = await API.get("/weddings/my");
+      const res = await API.get("/wedding/my");
       setWeddings(res?.data?.data || []);
     } catch (err) {
       showError("Failed to load weddings");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  useEffect(() => {
+  // ✅ REFRESH ON SCREEN FOCUS
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      fetchWeddings();
+    }, [])
+  );
+
+  // 🔄 Pull to refresh
+  const onRefresh = () => {
+    setRefreshing(true);
     fetchWeddings();
-  }, []);
+  };
 
   // 🔄 Loading
   if (loading) {
@@ -40,50 +55,65 @@ export default function MyWeddingsScreen({ navigation }: any) {
     );
   }
 
-  // ❌ Empty State
-  if (weddings.length === 0) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.emptyTitle}>No weddings yet 💍</Text>
-        <Text style={styles.emptySubtitle}>
-          Start by creating your first wedding
-        </Text>
-
-        <Button
-          title="Create Wedding"
-          onPress={() => navigation.navigate("CreateWedding")}
-          style={styles.button}
-        />
-      </View>
-    );
-  }
-
-  // ✅ List
   return (
     <View style={styles.container}>
-      <FlatList
-        data={weddings}
-        keyExtractor={(item: any) => item.id.toString()}
-        renderItem={({ item }: any) => (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() =>
-              navigation.navigate("Events", { weddingId: item.id })
-            }
-          >
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.budget}>
-              Budget: ₹{item.totalBudget || 0}
-            </Text>
-          </TouchableOpacity>
-        )}
+      {/* 🔹 Header ALWAYS */}
+      <Header
+        title="My Weddings"
+        subtitle="Plan your big day!"
+        userInitials="FM"
       />
 
-      <Button
-        title="Add Wedding"
+      {/* ❌ Empty */}
+      {weddings.length === 0 ? (
+        <View style={styles.center}>
+          <Text style={styles.emptyEmoji}>💍</Text>
+          <Text style={styles.emptyTitle}>No weddings yet</Text>
+          <Text style={styles.emptySubtitle}>
+            Create your first wedding to start planning
+          </Text>
+        </View>
+      ) : (
+        /* ✅ List */
+        <FlatList
+          data={weddings}
+          keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
+          contentContainerStyle={{ paddingBottom: 100 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate("Events", {
+                  weddingId: item.id,
+                })
+              }
+            >
+              <Text style={styles.title}>{item.title}</Text>
+
+              <Text style={styles.budget}>
+                ₹ {item.totalBudget || 0}
+              </Text>
+
+              <Text style={styles.arrow}>→</Text>
+            </TouchableOpacity>
+          )}
+        />
+      )}
+
+      {/* 🔥 FAB */}
+      <TouchableOpacity
+        style={styles.fab}
         onPress={() => navigation.navigate("CreateWedding")}
-        style={styles.floatingBtn}
-      />
+      >
+        <Text style={styles.fabText}>＋</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -99,45 +129,70 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+  },
+
+  emptyEmoji: {
+    fontSize: 50,
+    marginBottom: 10,
   },
 
   emptyTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
-    marginBottom: 10,
   },
 
   emptySubtitle: {
     fontSize: 14,
     color: "#777",
-    marginBottom: 20,
+    marginTop: 6,
     textAlign: "center",
+    paddingHorizontal: 20,
   },
 
   card: {
     backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 14,
+    padding: 18,
+    borderRadius: 16,
     marginBottom: 12,
     elevation: 3,
+    position: "relative",
   },
 
   title: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 17,
+    fontWeight: "700",
   },
 
   budget: {
-    marginTop: 4,
+    marginTop: 6,
+    fontSize: 13,
     color: "#666",
   },
 
-  button: {
-    marginTop: 20,
+  arrow: {
+    position: "absolute",
+    right: 16,
+    top: 18,
+    fontSize: 18,
+    color: "#aaa",
   },
 
-  floatingBtn: {
-    marginTop: 10,
+  fab: {
+    position: "absolute",
+    bottom: 25,
+    right: 20,
+    backgroundColor: "#6D2E46",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 6,
+  },
+
+  fabText: {
+    color: "#fff",
+    fontSize: 30,
+    fontWeight: "600",
   },
 });
